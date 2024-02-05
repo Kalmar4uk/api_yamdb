@@ -15,7 +15,7 @@ class AdminOnly(permissions.BasePermission):
         )
 
 
-'''class IsAdminUserOrReadOnly(permissions.BasePermission):
+class IsAdminUserOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
@@ -23,9 +23,9 @@ class AdminOnly(permissions.BasePermission):
             request.user.is_admin
             if request.user.is_authenticated else False
         )
-'''
 
-'''class AdminModeratorAuthorPermission(permissions.BasePermission):
+
+class AdminModeratorAuthorPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS
@@ -39,4 +39,3 @@ class AdminOnly(permissions.BasePermission):
             or request.user.is_moderator
             or request.user.is_admin
         )
-'''
