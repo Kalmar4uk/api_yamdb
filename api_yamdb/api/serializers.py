@@ -1,7 +1,9 @@
-from rest_framework import serializers
-from reviews.models import Category, Genre, Title, Review, Comment, User
+from datetime import datetime as dt
+
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
+from rest_framework import serializers
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class UsersSerializer(serializers.ModelSerializer):
@@ -145,3 +147,10 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
+
+    def validate_year(self, value):
+        if dt.now().year < value:
+            raise serializers.ValidationError(
+                'Год произведения не может быть больше текущего.'
+            )
+        return value

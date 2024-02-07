@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 from .validators import validate_username
 
@@ -75,29 +75,46 @@ class User(AbstractUser):
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField('Название', max_length=256)
+    slug = models.SlugField('Слаг', max_length=50, unique=True)
+
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
 
     def __str__(self):
         return self.name
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50)
+    name = models.CharField('Название', max_length=256)
+    slug = models.SlugField('Слаг', max_length=50, unique=True)
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=256)
-    year = models.IntegerField()
-    description = models.TextField()
-    genre = models.ManyToManyField(Genre)
+    name = models.CharField('Название', max_length=256)
+    year = models.IntegerField('Год')
+    description = models.TextField('Описание', null=True, blank=True)
+    genre = models.ManyToManyField(Genre, verbose_name='Жанр(-ы)')
     category = models.ForeignKey(
-        Category, on_delete=models.CASCADE, related_name='titles'
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='titles',
+        verbose_name='Категория'
     )
+
+    class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Проиведения'
 
     def __str__(self):
         return self.name
