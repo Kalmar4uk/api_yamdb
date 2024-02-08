@@ -5,8 +5,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title, User
 from reviews.validators import validate_correct_username, validate_username
-from rest_framework import serializers
-from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class UsersSerializer(serializers.ModelSerializer):
@@ -57,20 +55,6 @@ class SignUpSerializer(serializers.ModelSerializer):
         model = User
         lookup_field = 'username'
         fields = ('email', 'username')
-
-
-class GengreSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Genre
-        fields = '__all__'
-
-
-class TitleSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Title
-        fields = '__all__'
 
 
 class CommentSerializer(serializers.ModelSerializer):

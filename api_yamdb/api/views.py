@@ -1,28 +1,26 @@
 from django.conf import settings
-from django.core.mail import EmailMessage, send_mail
-from django.db import IntegrityError
 from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Category, Genre, Review, Title, User, ADMIN
+from reviews.models import ADMIN, Category, Genre, Review, Title, User
 
 from .filters import TitleFilterClass
 from .permissions import (AdminAnonPermission, AdminOnlyPermission,
                           AuthorModeratorAdminPermission)
 from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer,
-                          SignUpSerializer, TokenSerializer,
-                          UserMeSerializer, UsersSerializer,
-                          TitleSerializer)
-#from api.viewsets import ListCreateDelViewSet
+                          GenreSerializer, ReviewSerializer, SignUpSerializer,
+                          TitleSerializer, TokenSerializer, UserMeSerializer,
+                          UsersSerializer)
 
 
 class UsersViewSet(viewsets.ModelViewSet):
@@ -115,7 +113,6 @@ class APIToken(APIView):
             {'error': 'Неверный код подтверждения.'},
             status=status.HTTP_400_BAD_REQUEST
         )
-
 
 
 class GenreAndCategoryViewSet(
