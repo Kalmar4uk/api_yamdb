@@ -22,7 +22,6 @@ class UserAdmin(admin.ModelAdmin):
     ]
     search_fields = ('username',)
     list_filter = ('id',)
-    empty_value_display = '-пусто-'
 
 
 @admin.register(Title)
@@ -52,7 +51,6 @@ class ReviewAdmin(admin.ModelAdmin):
         'pub_date',
     )
     list_filter = ('author',)
-    empty_value_display = '-пусто-'
 
 
 @admin.register(Comment)
@@ -64,4 +62,3 @@ class CommentAdmin(admin.ModelAdmin):
         'pub_date',
     )
     list_filter = ('author',)
-    empty_value_display = '-пусто-'

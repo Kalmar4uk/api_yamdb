@@ -89,7 +89,7 @@ class Category(models.Model):
 class Title(models.Model):
     name = models.CharField('Название', max_length=256)
     year = models.IntegerField('Год')
-    description = models.TextField('Описание', null=True, blank=True)
+    description = models.TextField('Описание')
     genre = models.ManyToManyField(Genre, verbose_name='Жанр(-ы)')
     category = models.ForeignKey(
         Category,
@@ -137,6 +137,19 @@ class Review(models.Model):
         auto_now_add=True,
         db_index=True
     )
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('title', 'author', ),
+                name='unique review'
+            )]
+        ordering = ('pub_date',)
+
+    def str(self):
+        return self.text
 
 
 class Comment(models.Model):

@@ -118,7 +118,6 @@ class APIToken(APIView):
 class GenreAndCategoryViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
-    mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
@@ -156,6 +155,8 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
+    permission_classes = (AuthorModeratorAdminPermission,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
         title = get_object_or_404(
@@ -167,12 +168,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(
             Title,
             id=self.kwargs.get('title_id'))
-        serializer.save(title=title)
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (AuthorModeratorAdminPermission,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
         review = get_object_or_404(
