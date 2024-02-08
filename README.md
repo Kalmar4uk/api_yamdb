@@ -110,6 +110,6 @@ Django Rest Framework 3.12.4
 
 **Работу выполнили:**
 
-**Беспалов Роман** `https://github.com/Kalmar4uk`
-**Лазарев Дмитрий** `https://github.com/d-lyzarev`
-**Жуланов Олег** `https://github.com/DesperateBoy`
+- **Беспалов Роман** `https://github.com/Kalmar4uk`
+- **Лазарев Дмитрий** `https://github.com/d-lyzarev`
+- **Жуланов Олег** `https://github.com/DesperateBoy`
