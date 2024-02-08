@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
-models = {
+MODELS = {
     'User': User,
     'Category': Category,
     'Comment': Comment,
@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
         if name_model:
             name_model = name_model.title()
-            model = models[name_model]
+            model = MODELS[name_model]
             with open(
                 f'{settings.BASE_DIR}/static/data/{name_file}',
                 'r',
