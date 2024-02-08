@@ -102,3 +102,14 @@ python manage.py import_csv file_name.csv --model_name model
 * *file_name.csv* - название файла для загрузки
 * *--model_name model* - "--model_name" устанавливаетя для указания модели, "model" название модели в которую необходимо загрузить данные из файла
 > "--model_name model" **не прописывается только в том случае, если загружается файл для таблицы ManyToMany, команда в таком случае будет** ```python manage.py import_csv file_name.csv```
+
+**В проекте используется:**
+
+Django 3.2.16
+Django Rest Framework 3.12.4
+
+**Работу выполнили:**
+
+**Беспалов Роман** `https://github.com/Kalmar4uk`
+**Лазарев Дмитрий** `https://github.com/d-lyzarev`
+**Жуланов Олег** `https://github.com/DesperateBoy`
