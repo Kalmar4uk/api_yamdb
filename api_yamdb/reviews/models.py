@@ -1,103 +1,110 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
-from .validators import validate_username
+from reviews.validators import (validate_correct_username,
+                                validate_username)
 
 USER = 'user'
-ADMIN = 'admin'
 MODERATOR = 'moderator'
+ADMIN = 'admin'
 
-ROLE_CHOICES = [
+
+USER_ROLES = (
     (USER, USER),
-    (ADMIN, ADMIN),
     (MODERATOR, MODERATOR),
-]
+    (ADMIN, ADMIN),
+)
 
 
 class User(AbstractUser):
     username = models.CharField(
-        validators=(validate_username,),
+        verbose_name='Никнэйм пользователя',
+        validators=[validate_correct_username, validate_username],
         max_length=150,
         unique=True,
         blank=False,
         null=False
     )
+    first_name = models.CharField(
+        verbose_name='Имя пользователя',
+        max_length=150,
+        blank=True
+    )
+    last_name = models.CharField(
+        verbose_name='Фамилия пользователя',
+        max_length=150,
+        blank=True
+    )
     email = models.EmailField(
+        verbose_name='Почта пользователя',
         max_length=254,
         unique=True,
         blank=False,
         null=False
     )
     role = models.CharField(
-        max_length=20,
-        choices=ROLE_CHOICES,
-        default=USER,
+        verbose_name='Пользовательская роль',
+        max_length=16,
+        choices=USER_ROLES,
+        default='user',
         blank=True
     )
     bio = models.TextField(
-        blank=True,
-    )
-    first_name = models.CharField(
-        max_length=150,
+        verbose_name='Биография пользователя',
         blank=True
     )
-    last_name = models.CharField(
-        max_length=150,
-        blank=True
-    )
-    confirmation_code = models.CharField(
-        max_length=255,
-        null=True,
-        blank=False,
-        default='XXXX'
-    )
-
-    @property
-    def is_user(self):
-        return self.role == USER
-
-    @property
-    def is_admin(self):
-        return self.role == ADMIN
-
-    @property
-    def is_moderator(self):
-        return self.role == MODERATOR
 
     class Meta:
-        ordering = ('id',)
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+        ordering = ('id',)
 
     def __str__(self):
         return self.username
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField('Название', max_length=256)
+    slug = models.SlugField('Слаг', max_length=50, unique=True)
+
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
 
     def __str__(self):
         return self.name
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50)
+    name = models.CharField('Название', max_length=256)
+    slug = models.SlugField('Слаг', max_length=50, unique=True)
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=256)
-    year = models.IntegerField()
-    description = models.TextField()
-    genre = models.ManyToManyField(Genre)
+    name = models.CharField('Название', max_length=256)
+    year = models.IntegerField('Год')
+    description = models.TextField('Описание', null=True, blank=True)
+    genre = models.ManyToManyField(Genre, verbose_name='Жанр(-ы)')
     category = models.ForeignKey(
-        Category, on_delete=models.CASCADE, related_name='titles'
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='titles',
+        verbose_name='Категория'
     )
+
+    class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Проиведения'
 
     def __str__(self):
         return self.name

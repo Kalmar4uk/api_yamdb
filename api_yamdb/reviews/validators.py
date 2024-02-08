@@ -1,16 +1,20 @@
-import re
-
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
-def validate_username(value):
-    if value == 'me':
+def validate_correct_username(data):
+    if data.lower() == 'me':
         raise ValidationError(
-            ('Имя пользователя не может быть <me>.'),
-            params={'value': value},
+            f'Никнэйм пользователя не должен быть {data}'
         )
-    if re.search(r'^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$', value) is None:
+
+
+def validate_year(data):
+    if data >= timezone.now().year:
         raise ValidationError(
-            (f'Не допустимые символы <{value}> в имени.'),
-            params={'value': value},
+            'Год выпуска произведения не может быть больше текущего.'
         )
+
+
+validate_username = UnicodeUsernameValidator()

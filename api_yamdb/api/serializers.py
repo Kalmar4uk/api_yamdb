@@ -1,44 +1,59 @@
-from rest_framework import serializers
-from reviews.models import Category, Genre, Title, Review, Comment, User
+from datetime import datetime as dt
+
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
+from rest_framework import serializers
+from reviews.models import Category, Comment, Genre, Review, Title, User
+from reviews.validators import validate_correct_username, validate_username
 
 
 class UsersSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = (
-            'username', 'email', 'first_name',
-            'last_name', 'bio', 'role')
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role'
+        )
+        lookup_field = 'username'
 
 
-class NotAdminSerializer(serializers.ModelSerializer):
+class UserMeSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = (
-            'username', 'email', 'first_name',
-            'last_name', 'bio', 'role')
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role'
+        )
+        lookup_field = 'username'
         read_only_fields = ('role',)
 
 
-class GetTokenSerializer(serializers.ModelSerializer):
+class TokenSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         required=True)
     confirmation_code = serializers.CharField(
-        required=True)
+        required=True
+    )
 
     class Meta:
         model = User
-        fields = (
-            'username',
-            'confirmation_code'
-        )
+        fields = ('username', 'confirmation_code')
 
 
 class SignUpSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        max_length=150,
+        required=True,
+        validators=[validate_correct_username, validate_username]
+    )
+    email = serializers.EmailField(
+        required=True,
+        max_length=254
+    )
 
     class Meta:
         model = User
+        lookup_field = 'username'
         fields = ('email', 'username')
 
 
@@ -145,3 +160,10 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
+
+    def validate_year(self, value):
+        if dt.now().year < value:
+            raise serializers.ValidationError(
+                'Год произведения не может быть больше текущего.'
+            )
+        return value
