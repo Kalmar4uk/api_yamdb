@@ -105,8 +105,8 @@ python manage.py import_csv file_name.csv --model_name model
 
 **В проекте используется:**
 
-Django 3.2.16
-Django Rest Framework 3.12.4
+* Django 3.2.16
+* Django Rest Framework 3.12.4
 
 **Работу выполнили:**
 
