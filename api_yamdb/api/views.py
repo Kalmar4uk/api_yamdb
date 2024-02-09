@@ -1,28 +1,26 @@
 from django.conf import settings
-from django.core.mail import EmailMessage, send_mail
-from django.db import IntegrityError
 from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Category, Genre, Review, Title, User, ADMIN
+from reviews.models import Category, Genre, Review, Title, User
 
 from .filters import TitleFilterClass
 from .permissions import (AdminAnonPermission, AdminOnlyPermission,
                           AuthorModeratorAdminPermission)
 from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer,
-                          SignUpSerializer, TokenSerializer,
-                          UserMeSerializer, UsersSerializer,
-                          TitleSerializer)
-#from api.viewsets import ListCreateDelViewSet
+                          GenreSerializer, ReviewSerializer, SignUpSerializer,
+                          TitleSerializer, TokenSerializer, UserMeSerializer,
+                          UsersSerializer)
 
 
 class UsersViewSet(viewsets.ModelViewSet):
@@ -32,11 +30,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
-
-    def update(self, request, *args, **kwargs):
-        if request.method == 'PUT':
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        return super().update(request, *args, **kwargs)
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(
         methods=['get', 'patch'], detail=False,
@@ -45,7 +39,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     def get_users_info(self, request):
         serializer = UsersSerializer(request.user)
         if request.method == 'PATCH':
-            if request.user.role == ADMIN:
+            if request.user.is_admin:
                 serializer = UsersSerializer(
                     request.user, data=request.data, partial=True
                 )
@@ -81,7 +75,7 @@ class APISignup(APIView):
             subject='API YaMDB!',
             message=(
                 f'Добро пожаловать на сервис YaMDB, {user.username}!'
-                f'\nДля дальнейшей работы с API используйте код подтверждения.'
+                '\nДля дальнейшей работы с API используйте код подтверждения.'
                 f'\nВаш код подтверждения - {confirmation_code}'
             ),
             from_email=settings.EMAIL_SENDER,
@@ -99,13 +93,7 @@ class APIToken(APIView):
         serializer.is_valid(raise_exception=True)
         username = serializer.validated_data.get('username')
         confirmation_code = serializer.validated_data.get('confirmation_code')
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            return Response(
-                {'error': 'Пользователя не существует.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        user = get_object_or_404(User, username=username)
         if default_token_generator.check_token(
             user, confirmation_code
         ):
@@ -117,11 +105,9 @@ class APIToken(APIView):
         )
 
 
-
 class GenreAndCategoryViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
-    mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
@@ -159,6 +145,8 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
+    permission_classes = (AuthorModeratorAdminPermission,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
         title = get_object_or_404(
@@ -170,12 +158,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(
             Title,
             id=self.kwargs.get('title_id'))
-        serializer.save(title=title)
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (AuthorModeratorAdminPermission,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
         review = get_object_or_404(

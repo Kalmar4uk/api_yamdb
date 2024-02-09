@@ -1,10 +1,11 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from reviews.models import Category, Comment, Genre, Review, Title, User
+from .models import Category, Comment, Genre, Review, Title, User
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(BaseUserAdmin):
     list_display = (
         'id',
         'username',
@@ -22,41 +23,23 @@ class UserAdmin(admin.ModelAdmin):
     ]
     search_fields = ('username',)
     list_filter = ('id',)
-    empty_value_display = '-пусто-'
-
-
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'name',
-        'slug',
-    )
-    list_filter = ('name',)
-    empty_value_display = '-пусто-'
-
-
-@admin.register(Genre)
-class GenreAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'name',
-        'slug',
-    )
-    list_filter = ('name',)
-    empty_value_display = '-пусто-'
 
 
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'name',
-        'year',
-        'category',
-    )
-    list_filter = ('category',)
-    empty_value_display = '-пусто-'
+    list_display = ('name', 'year', 'category')
+    list_filter = ('year', 'category')
+    search_fields = ('name',)
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+
+@admin.register(Genre)
+class GenreAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
 
 
 @admin.register(Review)
@@ -69,7 +52,6 @@ class ReviewAdmin(admin.ModelAdmin):
         'pub_date',
     )
     list_filter = ('author',)
-    empty_value_display = '-пусто-'
 
 
 @admin.register(Comment)
@@ -81,4 +63,3 @@ class CommentAdmin(admin.ModelAdmin):
         'pub_date',
     )
     list_filter = ('author',)
-    empty_value_display = '-пусто-'
