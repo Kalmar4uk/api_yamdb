@@ -26,9 +26,14 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'year', 'category')
+    list_display = ('name', 'year', 'category', 'get_genre')
     list_filter = ('year', 'category')
+    list_editable = ('category',)
     search_fields = ('name',)
+
+    @admin.display(description='Жанр(-ы)')
+    def get_genre(self, obj):
+        return ', '.join([genre.name for genre in obj.genre.all()])
 
 
 @admin.register(Category)

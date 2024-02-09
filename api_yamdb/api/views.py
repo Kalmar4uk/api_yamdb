@@ -12,7 +12,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import ADMIN, Category, Genre, Review, Title, User
 
 from .filters import TitleFilterClass
 from .permissions import (AdminAnonPermission, AdminOnlyPermission,
@@ -21,6 +20,7 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
                           TitleSerializer, TokenSerializer, UserMeSerializer,
                           UsersSerializer)
+from reviews.models import ADMIN, Category, Genre, Review, Title, User
 
 
 class UsersViewSet(viewsets.ModelViewSet):
@@ -130,12 +130,12 @@ class GenreAndCategoryViewSet(
 
 
 class CategoryViewSet(GenreAndCategoryViewSet):
-    queryset = Category.objects.all().order_by('id')
+    queryset = Category.objects.all().order_by('name')
     serializer_class = CategorySerializer
 
 
 class GengreViewSet(GenreAndCategoryViewSet):
-    queryset = Genre.objects.all().order_by('id')
+    queryset = Genre.objects.all().order_by('name')
     serializer_class = GenreSerializer
 
 
@@ -144,11 +144,12 @@ class TitleViewSet(viewsets.ModelViewSet):
         rating=Avg(
             'reviews__score'
         )
-    ).all().order_by('id')
+    ).all().order_by('-year')
     serializer_class = TitleSerializer
-    permission_classes = (AdminAnonPermission,)
-    filter_backends = (DjangoFilterBackend,)
+    # permission_classes = (AdminAnonPermission,)
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = TitleFilterClass
+    ordering_fields = ('name', 'rating')
     pagination_class = PageNumberPagination
     http_method_names = ['get', 'post', 'patch', 'delete']
 

@@ -3,6 +3,8 @@ from datetime import datetime as dt
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+
+from api import fields
 from reviews.models import Category, Comment, Genre, Review, Title, User
 from reviews.validators import validate_correct_username, validate_username
 
@@ -119,29 +121,18 @@ class GenreSerializer(serializers.ModelSerializer):
         exclude = ('id',)
 
 
-class CategoryField(serializers.SlugRelatedField):
-    def to_representation(self, obj):
-        serializer = CategorySerializer(obj)
-        return serializer.data
-
-
-class GenreField(serializers.SlugRelatedField):
-    def to_representation(self, obj):
-        serializer = GenreSerializer(obj)
-        return serializer.data
-
-
 class TitleSerializer(serializers.ModelSerializer):
-    category = CategoryField(
+    category = fields.CategoryField(
         queryset=Category.objects.all(),
         slug_field='slug'
     )
-    genre = GenreField(
+    genre = fields.GenreField(
         queryset=Genre.objects.all(),
         slug_field='slug',
+        allow_empty=False,
         many=True
     )
-    rating = serializers.IntegerField(read_only=True)
+    rating = serializers.IntegerField(read_only=True, default=None)
 
     class Meta:
         model = Title

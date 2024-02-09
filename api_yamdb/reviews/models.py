@@ -1,7 +1,13 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from reviews.validators import validate_correct_username, validate_username
+
+from core.models import CatogoryGenreModel
+from reviews.validators import (
+    validate_correct_username,
+    validate_username,
+    validate_year
+)
 
 USER = 'user'
 MODERATOR = 'moderator'
@@ -62,34 +68,24 @@ class User(AbstractUser):
         return self.username
 
 
-class Genre(models.Model):
-    name = models.CharField('Название', max_length=256)
-    slug = models.SlugField('Слаг', max_length=50, unique=True)
+class Genre(CatogoryGenreModel):
 
-    class Meta:
+    class Meta(CatogoryGenreModel.Meta):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
-    def __str__(self):
-        return self.name
 
+class Category(CatogoryGenreModel):
 
-class Category(models.Model):
-    name = models.CharField('Название', max_length=256)
-    slug = models.SlugField('Слаг', max_length=50, unique=True)
-
-    class Meta:
+    class Meta(CatogoryGenreModel.Meta):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
-
-    def __str__(self):
-        return self.name
 
 
 class Title(models.Model):
     name = models.CharField('Название', max_length=256)
-    year = models.IntegerField('Год')
-    description = models.TextField('Описание')
+    year = models.SmallIntegerField('Год', validators=[validate_year])
+    description = models.TextField('Описание', null=True, blank=True)
     genre = models.ManyToManyField(Genre, verbose_name='Жанр(-ы)')
     category = models.ForeignKey(
         Category,
@@ -103,9 +99,10 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Проиведения'
+        ordering = ('year',)
 
     def __str__(self):
-        return self.name
+        return self.name[:10]
 
 
 class Review(models.Model):
