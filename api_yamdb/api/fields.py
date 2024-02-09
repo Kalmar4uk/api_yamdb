@@ -11,5 +11,5 @@ class CategoryField(serializers.SlugRelatedField):
 
 class GenreField(serializers.SlugRelatedField):
     def to_representation(self, obj):
-        serializer = api.serializersGenreSerializer(obj)
+        serializer = api.serializers.GenreSerializer(obj)
         return serializer.data
