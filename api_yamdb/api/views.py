@@ -146,7 +146,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         )
     ).all().order_by('-year')
     serializer_class = TitleSerializer
-    # permission_classes = (AdminAnonPermission,)
+    permission_classes = (AdminAnonPermission,)
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = TitleFilterClass
     ordering_fields = ('name', 'rating')
