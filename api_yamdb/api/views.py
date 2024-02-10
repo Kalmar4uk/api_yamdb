@@ -19,7 +19,7 @@ from .permissions import (AdminAnonPermission, AdminOnlyPermission,
                           AuthorModeratorAdminPermission)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleSerializer, TokenSerializer, UserMeSerializer,
+                          TitleSerializer, TokenSerializer,
                           UsersSerializer)
 
 
@@ -38,17 +38,12 @@ class UsersViewSet(viewsets.ModelViewSet):
     )
     def get_users_info(self, request):
         serializer = UsersSerializer(request.user)
-        if request.method == 'PATCH':
-            if request.user.is_admin:
-                serializer = UsersSerializer(
-                    request.user, data=request.data, partial=True
-                )
-            else:
-                serializer = UserMeSerializer(
-                    request.user, data=request.data, partial=True
-                )
+        if request.method == 'PATCH':            
+            serializer = UsersSerializer(
+                request.user, data=request.data, partial=True
+            )
             serializer.is_valid(raise_exception=True)
-            serializer.save()
+            serializer.save(role=self.request.user.role)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -92,17 +87,9 @@ class APIToken(APIView):
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         username = serializer.validated_data.get('username')
-        confirmation_code = serializer.validated_data.get('confirmation_code')
         user = get_object_or_404(User, username=username)
-        if default_token_generator.check_token(
-            user, confirmation_code
-        ):
-            token = str(RefreshToken.for_user(user).access_token)
-            return Response({'token': token}, status=status.HTTP_201_CREATED)
-        return Response(
-            {'error': 'Неверный код подтверждения.'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        token = str(RefreshToken.for_user(user).access_token)
+        return Response({'token': token}, status=status.HTTP_201_CREATED)
 
 
 class GenreAndCategoryViewSet(

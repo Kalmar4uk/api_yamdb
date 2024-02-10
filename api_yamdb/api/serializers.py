@@ -1,5 +1,6 @@
 from datetime import datetime as dt
 
+from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -17,17 +18,6 @@ class UsersSerializer(serializers.ModelSerializer):
         lookup_field = 'username'
 
 
-class UserMeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = (
-            'username', 'email', 'first_name', 'last_name', 'bio', 'role'
-        )
-        lookup_field = 'username'
-        read_only_fields = ('role',)
-
-
 class TokenSerializer(serializers.Serializer):
     username = serializers.CharField(
         required=True)
@@ -38,6 +28,13 @@ class TokenSerializer(serializers.Serializer):
     class Meta:
         model = User
         fields = ('username', 'confirmation_code')
+
+    def validate(self, data):
+        user = get_object_or_404(User, username=data['username'])
+        confirmation_code = default_token_generator.make_token(user)
+        if str(confirmation_code) != data['confirmation_code']:
+            raise ValidationError('Неверный код подтверждения')
+        return data
 
 
 class SignUpSerializer(serializers.Serializer):

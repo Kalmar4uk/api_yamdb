@@ -23,16 +23,7 @@ class User(AbstractUser):
         unique=True,
         null=False
     )
-    first_name = models.CharField(
-        verbose_name='Имя пользователя',
-        max_length=150,
-        blank=True
-    )
-    last_name = models.CharField(
-        verbose_name='Фамилия пользователя',
-        max_length=150,
-        blank=True
-    )
+ 
     email = models.EmailField(
         verbose_name='Почта пользователя',
         max_length=254,
@@ -178,7 +169,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='автор'
-    )
+    )   
     pub_date = models.DateTimeField(
         'дата публикации',
         auto_now_add=True,
