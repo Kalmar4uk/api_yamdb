@@ -27,19 +27,9 @@ class User(AbstractUser):
         validators=[validate_correct_username, validate_username],
         max_length=150,
         unique=True,
-        blank=False,
         null=False
     )
-    first_name = models.CharField(
-        verbose_name='Имя пользователя',
-        max_length=150,
-        blank=True
-    )
-    last_name = models.CharField(
-        verbose_name='Фамилия пользователя',
-        max_length=150,
-        blank=True
-    )
+
     email = models.EmailField(
         verbose_name='Почта пользователя',
         max_length=254,
@@ -51,7 +41,7 @@ class User(AbstractUser):
         verbose_name='Пользовательская роль',
         max_length=16,
         choices=USER_ROLES,
-        default='user',
+        default=USER,
         blank=True
     )
     bio = models.TextField(
@@ -59,10 +49,21 @@ class User(AbstractUser):
         blank=True
     )
 
+    @property
+    def is_user(self):
+        return self.role == USER
+
+    @property
+    def is_admin(self):
+        return self.role == ADMIN
+
+    @property
+    def is_moderator(self):
+        return self.role == MODERATOR
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-        ordering = ('id',)
 
     def __str__(self):
         return self.username

@@ -18,9 +18,8 @@ from .permissions import (AdminAnonPermission, AdminOnlyPermission,
                           AuthorModeratorAdminPermission)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleSerializer, TokenSerializer, UserMeSerializer,
-                          UsersSerializer)
-from reviews.models import ADMIN, Category, Genre, Review, Title, User
+                          TitleSerializer, TokenSerializer, UsersSerializer)
+from reviews.models import Category, Genre, Review, Title, User
 
 
 class UsersViewSet(viewsets.ModelViewSet):
@@ -30,11 +29,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
-
-    def update(self, request, *args, **kwargs):
-        if request.method == 'PUT':
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        return super().update(request, *args, **kwargs)
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(
         methods=['get', 'patch'], detail=False,
@@ -42,17 +37,12 @@ class UsersViewSet(viewsets.ModelViewSet):
     )
     def get_users_info(self, request):
         serializer = UsersSerializer(request.user)
-        if request.method == 'PATCH':
-            if request.user.role == ADMIN:
-                serializer = UsersSerializer(
-                    request.user, data=request.data, partial=True
-                )
-            else:
-                serializer = UserMeSerializer(
-                    request.user, data=request.data, partial=True
-                )
+        if request.method == 'PATCH':            
+            serializer = UsersSerializer(
+                request.user, data=request.data, partial=True
+            )
             serializer.is_valid(raise_exception=True)
-            serializer.save()
+            serializer.save(role=self.request.user.role)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -79,7 +69,7 @@ class APISignup(APIView):
             subject='API YaMDB!',
             message=(
                 f'Добро пожаловать на сервис YaMDB, {user.username}!'
-                f'\nДля дальнейшей работы с API используйте код подтверждения.'
+                '\nДля дальнейшей работы с API используйте код подтверждения.'
                 f'\nВаш код подтверждения - {confirmation_code}'
             ),
             from_email=settings.EMAIL_SENDER,
@@ -96,23 +86,9 @@ class APIToken(APIView):
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         username = serializer.validated_data.get('username')
-        confirmation_code = serializer.validated_data.get('confirmation_code')
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            return Response(
-                {'error': 'Пользователя не существует.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        if default_token_generator.check_token(
-            user, confirmation_code
-        ):
-            token = str(RefreshToken.for_user(user).access_token)
-            return Response({'token': token}, status=status.HTTP_201_CREATED)
-        return Response(
-            {'error': 'Неверный код подтверждения.'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        user = get_object_or_404(User, username=username)
+        token = str(RefreshToken.for_user(user).access_token)
+        return Response({'token': token}, status=status.HTTP_201_CREATED)
 
 
 class GenreAndCategoryViewSet(
