@@ -28,7 +28,7 @@ class UserMeSerializer(serializers.ModelSerializer):
         read_only_fields = ('role',)
 
 
-class TokenSerializer(serializers.ModelSerializer):
+class TokenSerializer(serializers.Serializer):
     username = serializers.CharField(
         required=True)
     confirmation_code = serializers.CharField(
@@ -40,7 +40,7 @@ class TokenSerializer(serializers.ModelSerializer):
         fields = ('username', 'confirmation_code')
 
 
-class SignUpSerializer(serializers.ModelSerializer):
+class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(
         max_length=150,
         required=True,

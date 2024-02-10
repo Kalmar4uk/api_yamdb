@@ -15,6 +15,9 @@ class UserAdmin(BaseUserAdmin):
         'bio',
         'role',
     )
+    list_editable = (
+        'role',
+    )
     exclude = [
         'last_login', 'is_staff',
         'is_active', 'date_joined',
