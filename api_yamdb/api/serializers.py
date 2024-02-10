@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from api import fields
+from api.constants import LEN_FIELD
 from reviews.models import Category, Comment, Genre, Review, Title, User
 from reviews.validators import validate_correct_username, validate_username
 
@@ -41,13 +42,13 @@ class TokenSerializer(serializers.Serializer):
 
 class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(
-        max_length=150,
+        max_length=LEN_FIELD['MAX_LEN_USERNAME'],
         required=True,
         validators=[validate_correct_username, validate_username]
     )
     email = serializers.EmailField(
         required=True,
-        max_length=254
+        max_length=LEN_FIELD['MAX_LEN_EMAIL']
     )
 
     class Meta:

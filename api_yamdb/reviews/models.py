@@ -3,21 +3,13 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from core.models import CatogoryGenreModel
+from reviews.constants import (
+    ADMIN, LEN_FIELD, MAX_LEN_LEAD, MODERATOR, USER, USER_ROLES
+)
 from reviews.validators import (
     validate_correct_username,
     validate_username,
     validate_year
-)
-
-USER = 'user'
-MODERATOR = 'moderator'
-ADMIN = 'admin'
-
-
-USER_ROLES = (
-    (USER, USER),
-    (MODERATOR, MODERATOR),
-    (ADMIN, ADMIN),
 )
 
 
@@ -25,21 +17,21 @@ class User(AbstractUser):
     username = models.CharField(
         verbose_name='Никнэйм пользователя',
         validators=[validate_correct_username, validate_username],
-        max_length=150,
+        max_length=LEN_FIELD['MAX_LEN_USERNAME'],
         unique=True,
         null=False
     )
 
     email = models.EmailField(
         verbose_name='Почта пользователя',
-        max_length=254,
+        max_length=LEN_FIELD['MAX_LEN_EMAIL'],
         unique=True,
         blank=False,
         null=False
     )
     role = models.CharField(
         verbose_name='Пользовательская роль',
-        max_length=16,
+        max_length=LEN_FIELD['MAX_LEN_ROLE'],
         choices=USER_ROLES,
         default=USER,
         blank=True
@@ -84,7 +76,10 @@ class Category(CatogoryGenreModel):
 
 
 class Title(models.Model):
-    name = models.CharField('Название', max_length=256)
+    name = models.CharField(
+        'Название',
+        max_length=LEN_FIELD['MAX_LEN_NAME_TIT_CAT_GEN']
+    )
     year = models.SmallIntegerField('Год', validators=[validate_year])
     description = models.TextField('Описание', null=True, blank=True)
     genre = models.ManyToManyField(Genre, verbose_name='Жанр(-ы)')
@@ -103,7 +98,7 @@ class Title(models.Model):
         ordering = ('year',)
 
     def __str__(self):
-        return self.name[:10]
+        return self.name[:MAX_LEN_LEAD]
 
 
 class Review(models.Model):
@@ -114,7 +109,7 @@ class Review(models.Model):
         verbose_name='произведение'
     )
     text = models.CharField(
-        max_length=200
+        max_length=LEN_FIELD['MAX_LEN_TEXT_REW_COM']
     )
     author = models.ForeignKey(
         User,
@@ -125,8 +120,8 @@ class Review(models.Model):
     score = models.IntegerField(
         'оценка',
         validators=(
-            MinValueValidator(1),
-            MaxValueValidator(10)
+            MinValueValidator(LEN_FIELD['MIN_VALUE_VALID']),
+            MaxValueValidator(LEN_FIELD['MAX_VALUE_VALID'])
         ),
         error_messages={'validators': 'Оценка от 1 до 10!'}
     )
@@ -159,7 +154,7 @@ class Comment(models.Model):
     )
     text = models.CharField(
         'текст комментария',
-        max_length=200
+        max_length=LEN_FIELD['MAX_LEN_TEXT_REW_COM']
     )
     author = models.ForeignKey(
         User,

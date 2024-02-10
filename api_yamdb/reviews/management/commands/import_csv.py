@@ -1,7 +1,8 @@
 import csv
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
+
+from reviews.constants import PATH_TO_FILE
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 MODELS = {
@@ -33,9 +34,7 @@ class Command(BaseCommand):
             name_model = name_model.title()
             model = MODELS[name_model]
             with open(
-                f'{settings.BASE_DIR}/static/data/{name_file}',
-                'r',
-                encoding='utf-8'
+                f'{PATH_TO_FILE}{name_file}', 'r', encoding='utf-8'
             ) as csvfile:
                 reader = csv.DictReader(csvfile)
                 model.objects.bulk_create(
@@ -46,9 +45,7 @@ class Command(BaseCommand):
                 )
         else:
             with open(
-                f'{settings.BASE_DIR}/static/data/{name_file}',
-                'r',
-                encoding='utf-8'
+                f'{PATH_TO_FILE}{name_file}', 'r', encoding='utf-8'
             ) as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
