@@ -5,7 +5,7 @@ from .models import Category, Comment, Genre, Review, Title, User
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(BaseUserAdmin):
     list_display = (
         'id',
         'username',
