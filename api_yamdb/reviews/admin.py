@@ -15,15 +15,21 @@ class UserAdmin(BaseUserAdmin):
         'bio',
         'role',
     )
-    list_editable = (
-        'role',
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Personal info', {'fields': ('email', 'first_name',
+                                      'last_name', 'bio', 'role')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff',
+                                    'is_superuser', 'groups',
+                                    'user_permissions')}),
     )
-    exclude = [
-        'last_login', 'is_staff',
-        'is_active', 'date_joined',
-        'groups', 'user_permissions',
-        'password'
-    ]
+    add_fieldsets = (
+        (None, {'fields': ('username', 'password1', 'password2')}),
+        ('Personal info', {'fields': ('email', 'first_name',
+                                      'last_name', 'bio', 'role')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser',
+                                    'groups', 'user_permissions')}),
+    )
     search_fields = ('username',)
     list_filter = ('id',)
 
