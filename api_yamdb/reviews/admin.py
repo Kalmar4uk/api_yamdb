@@ -17,19 +17,20 @@ class UserAdmin(BaseUserAdmin):
     )
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('email', 'first_name',
-                                      'last_name', 'bio', 'role')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff',
-                                    'is_superuser', 'groups',
-                                    'user_permissions')}),
+        ('Персональная информация', {'fields': ('email', 'first_name',
+                                                'last_name', 'bio', 'role')}),
+        ('Разрешения', {'fields': ('is_active', 'is_staff',
+                                   'is_superuser', 'groups',
+                                   'user_permissions')}),
     )
     add_fieldsets = (
         (None, {'fields': ('username', 'password1', 'password2')}),
-        ('Personal info', {'fields': ('email', 'first_name',
-                                      'last_name', 'bio', 'role')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser',
-                                    'groups', 'user_permissions')}),
+        ('Персональная информация', {'fields': ('email', 'first_name',
+                                                'last_name', 'bio', 'role')}),
+        ('Разрешения', {'fields': ('is_active', 'is_staff', 'is_superuser',
+                                   'groups', 'user_permissions')}),
     )
+    list_display_links = ('username',)
     search_fields = ('username',)
     list_filter = ('id',)
 
