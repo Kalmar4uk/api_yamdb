@@ -142,7 +142,7 @@ class Review(models.Model):
         ordering = ('pub_date',)
 
     def str(self):
-        return self.text
+        return self.text[:MAX_LEN_LEAD]
 
 
 class Comment(models.Model):
@@ -173,4 +173,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def str(self):
-        return self.text
+        return self.text[:MAX_LEN_LEAD]
