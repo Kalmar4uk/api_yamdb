@@ -5,7 +5,7 @@ from .models import Category, Comment, Genre, Review, Title, User
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'username',
@@ -18,8 +18,13 @@ class UserAdmin(BaseUserAdmin):
     list_editable = (
         'role',
     )
+    exclude = [
+        'last_login', 'is_staff',
+        'is_active', 'date_joined',
+        'groups', 'user_permissions',
+        'password'
+    ]
     list_display_links = ('username',)
-    exclude = ('id',)
     search_fields = ('username',)
     list_filter = ('id',)
 
