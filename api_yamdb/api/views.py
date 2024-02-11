@@ -37,7 +37,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     )
     def get_users_info(self, request):
         serializer = UsersSerializer(request.user)
-        if request.method == 'PATCH':            
+        if request.method == 'PATCH':
             serializer = UsersSerializer(
                 request.user, data=request.data, partial=True
             )

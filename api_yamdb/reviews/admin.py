@@ -15,15 +15,21 @@ class UserAdmin(admin.ModelAdmin):
         'bio',
         'role',
     )
-    list_editable = (
-        'role',
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Персональная информация', {'fields': ('email', 'first_name',
+                                                'last_name', 'bio', 'role')}),
+        ('Разрешения', {'fields': ('is_active', 'is_staff',
+                                   'is_superuser', 'groups',
+                                   'user_permissions')}),
     )
-    exclude = [
-        'last_login', 'is_staff',
-        'is_active', 'date_joined',
-        'groups', 'user_permissions',
-        'password'
-    ]
+    add_fieldsets = (
+        (None, {'fields': ('username', 'password1', 'password2')}),
+        ('Персональная информация', {'fields': ('email', 'first_name',
+                                                'last_name', 'bio', 'role')}),
+        ('Разрешения', {'fields': ('is_active', 'is_staff', 'is_superuser',
+                                   'groups', 'user_permissions')}),
+    )
     list_display_links = ('username',)
     search_fields = ('username',)
     list_filter = ('id',)
