@@ -1,17 +1,15 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from reviews.validators import validate_correct_username, validate_username
 
-USER = 'user'
-MODERATOR = 'moderator'
-ADMIN = 'admin'
-
-
-USER_ROLES = (
-    (USER, USER),
-    (MODERATOR, MODERATOR),
-    (ADMIN, ADMIN),
+from core.models import CatogoryGenreModel
+from reviews.constants import (
+    ADMIN, LEN_FIELD, MAX_LEN_LEAD, MODERATOR, USER, USER_ROLES
+)
+from reviews.validators import (
+    validate_correct_username,
+    validate_username,
+    validate_year
 )
 
 
@@ -19,21 +17,19 @@ class User(AbstractUser):
     username = models.CharField(
         verbose_name='Никнэйм пользователя',
         validators=[validate_correct_username, validate_username],
-        max_length=150,
+        max_length=LEN_FIELD['MAX_LEN_USERNAME'],
         unique=True,
-        null=False
     )
 
     email = models.EmailField(
         verbose_name='Почта пользователя',
-        max_length=254,
+        max_length=LEN_FIELD['MAX_LEN_EMAIL'],
         unique=True,
-        blank=False,
         null=False
     )
     role = models.CharField(
         verbose_name='Пользовательская роль',
-        max_length=16,
+        max_length=LEN_FIELD['MAX_LEN_ROLE'],
         choices=USER_ROLES,
         default=USER,
         blank=True
@@ -44,12 +40,12 @@ class User(AbstractUser):
     )
 
     @property
-    def is_user(self):
-        return self.role == USER
-
-    @property
     def is_admin(self):
-        return self.role == ADMIN
+        return (
+            self.role == ADMIN
+            or self.is_staff
+            or self.is_superuser
+        )
 
     @property
     def is_moderator(self):
@@ -58,39 +54,33 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+        ordering = ('username',)
 
     def __str__(self):
         return self.username
 
 
-class Genre(models.Model):
-    name = models.CharField('Название', max_length=256)
-    slug = models.SlugField('Слаг', max_length=50, unique=True)
+class Genre(CatogoryGenreModel):
 
-    class Meta:
+    class Meta(CatogoryGenreModel.Meta):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
-    def __str__(self):
-        return self.name
 
+class Category(CatogoryGenreModel):
 
-class Category(models.Model):
-    name = models.CharField('Название', max_length=256)
-    slug = models.SlugField('Слаг', max_length=50, unique=True)
-
-    class Meta:
+    class Meta(CatogoryGenreModel.Meta):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
-    def __str__(self):
-        return self.name
-
 
 class Title(models.Model):
-    name = models.CharField('Название', max_length=256)
-    year = models.IntegerField('Год')
-    description = models.TextField('Описание')
+    name = models.CharField(
+        'Название',
+        max_length=LEN_FIELD['MAX_LEN_NAME_TIT_CAT_GEN']
+    )
+    year = models.SmallIntegerField('Год', validators=[validate_year])
+    description = models.TextField('Описание', null=True, blank=True)
     genre = models.ManyToManyField(Genre, verbose_name='Жанр(-ы)')
     category = models.ForeignKey(
         Category,
@@ -104,9 +94,10 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Проиведения'
+        ordering = ('year',)
 
     def __str__(self):
-        return self.name
+        return self.name[:MAX_LEN_LEAD]
 
 
 class Review(models.Model):
@@ -117,7 +108,7 @@ class Review(models.Model):
         verbose_name='произведение'
     )
     text = models.CharField(
-        max_length=200
+        max_length=LEN_FIELD['MAX_LEN_TEXT_REW_COM']
     )
     author = models.ForeignKey(
         User,
@@ -128,8 +119,8 @@ class Review(models.Model):
     score = models.IntegerField(
         'оценка',
         validators=(
-            MinValueValidator(1),
-            MaxValueValidator(10)
+            MinValueValidator(LEN_FIELD['MIN_VALUE_VALID']),
+            MaxValueValidator(LEN_FIELD['MAX_VALUE_VALID'])
         ),
         error_messages={'validators': 'Оценка от 1 до 10!'}
     )
@@ -150,7 +141,7 @@ class Review(models.Model):
         ordering = ('pub_date',)
 
     def str(self):
-        return self.text
+        return self.text[:MAX_LEN_LEAD]
 
 
 class Comment(models.Model):
@@ -162,7 +153,7 @@ class Comment(models.Model):
     )
     text = models.CharField(
         'текст комментария',
-        max_length=200
+        max_length=LEN_FIELD['MAX_LEN_TEXT_REW_COM']
     )
     author = models.ForeignKey(
         User,
@@ -181,4 +172,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def str(self):
-        return self.text
+        return self.text[:MAX_LEN_LEAD]

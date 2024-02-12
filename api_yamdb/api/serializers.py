@@ -1,9 +1,10 @@
-from datetime import datetime as dt
-
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+
+from api import fields
+from reviews.constants import LEN_FIELD
 from reviews.models import Category, Comment, Genre, Review, Title, User
 from reviews.validators import validate_correct_username, validate_username
 
@@ -39,13 +40,13 @@ class TokenSerializer(serializers.Serializer):
 
 class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(
-        max_length=150,
+        max_length=LEN_FIELD['MAX_LEN_USERNAME'],
         required=True,
         validators=[validate_correct_username, validate_username]
     )
     email = serializers.EmailField(
         required=True,
-        max_length=254
+        max_length=LEN_FIELD['MAX_LEN_EMAIL']
     )
 
     class Meta:
@@ -65,7 +66,7 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'review', 'text', 'author', 'pub_date')
         model = Comment
 
 
@@ -78,27 +79,21 @@ class ReviewSerializer(serializers.ModelSerializer):
         slug_field='username',
         read_only=True
     )
+    score = serializers.IntegerField(
+        min_value=LEN_FIELD['MIN_VALUE_VALID'],
+        max_value=LEN_FIELD['MAX_VALUE_VALID']
+    )
 
     class Meta:
         model = Review
-        fields = '__all__'
-
-    def validate_score(self, value):
-        if 0 > value > 10:
-            raise serializers.ValidationError('Оценка по 10-бальной шкале!')
-        return value
+        fields = ('id', 'text', 'title', 'author', 'score', 'pub_date')
 
     def validate(self, data):
         request = self.context['request']
-        title_id = self.context.get('view').kwargs.get('title_id')
-        title = get_object_or_404(Title, pk=title_id)
-        if (
-            request.method == 'POST'
-            and Review.objects.filter(
-                title=title, author=request.user
-            ).exists()
-        ):
-            raise ValidationError('Может существовать только один отзыв!')
+        if request.method == 'POST':
+            title_id = self.context.get('view').kwargs.get('title_id')
+            if Review.objects.filter(title=title_id, author=request.user):
+                raise ValidationError('Может существовать только один отзыв!')
         return data
 
 
@@ -116,39 +111,22 @@ class GenreSerializer(serializers.ModelSerializer):
         exclude = ('id',)
 
 
-class CategoryField(serializers.SlugRelatedField):
-    def to_representation(self, obj):
-        serializer = CategorySerializer(obj)
-        return serializer.data
-
-
-class GenreField(serializers.SlugRelatedField):
-    def to_representation(self, obj):
-        serializer = GenreSerializer(obj)
-        return serializer.data
-
-
 class TitleSerializer(serializers.ModelSerializer):
-    category = CategoryField(
+    category = fields.CategoryField(
         queryset=Category.objects.all(),
         slug_field='slug'
     )
-    genre = GenreField(
+    genre = fields.GenreField(
         queryset=Genre.objects.all(),
         slug_field='slug',
+        allow_empty=False,
+        allow_null=False,
         many=True
     )
-    rating = serializers.IntegerField(read_only=True)
+    rating = serializers.IntegerField(read_only=True, default=None)
 
     class Meta:
         model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
-
-    def validate_year(self, value):
-        if dt.now().year < value:
-            raise serializers.ValidationError(
-                'Год произведения не может быть больше текущего.'
-            )
-        return value
