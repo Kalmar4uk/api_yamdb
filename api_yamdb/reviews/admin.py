@@ -31,6 +31,7 @@ class UserAdmin(BaseUserAdmin):
                                    'groups', 'user_permissions')}),
     )
     list_display_links = ('username',)
+    list_editable = ('role',)
     search_fields = ('username',)
     list_filter = ('id',)
 

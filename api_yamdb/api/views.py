@@ -8,7 +8,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -25,7 +26,8 @@ from reviews.models import Category, Genre, Review, Title, User
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UsersSerializer
-    permission_classes = (IsAuthenticated, AdminOnlyPermission,)
+    permission_classes = (IsAuthenticated, AdminOnlyPermission,
+                          IsAuthenticatedOrReadOnly)
     lookup_field = 'username'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
@@ -132,7 +134,8 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (AuthorModeratorAdminPermission,)
+    permission_classes = (AuthorModeratorAdminPermission,
+                          IsAuthenticatedOrReadOnly)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_title(self):
@@ -151,7 +154,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (AuthorModeratorAdminPermission,)
+    permission_classes = (AuthorModeratorAdminPermission,
+                          IsAuthenticatedOrReadOnly)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_review(self):

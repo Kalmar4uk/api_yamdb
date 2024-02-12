@@ -18,14 +18,12 @@ class User(AbstractUser):
         validators=[validate_correct_username, validate_username],
         max_length=LEN_FIELD['MAX_LEN_USERNAME'],
         unique=True,
-        null=False
     )
 
     email = models.EmailField(
         verbose_name='Почта пользователя',
         max_length=LEN_FIELD['MAX_LEN_EMAIL'],
         unique=True,
-        blank=False,
         null=False
     )
     role = models.CharField(
@@ -41,12 +39,12 @@ class User(AbstractUser):
     )
 
     @property
-    def is_user(self):
-        return self.role == USER
-
-    @property
     def is_admin(self):
-        return self.role == ADMIN
+        return (
+            self.role == ADMIN
+            or self.is_staff
+            or self.is_superuser
+        )
 
     @property
     def is_moderator(self):
@@ -55,6 +53,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+        ordering = ('username',)
 
     def __str__(self):
         return self.username
@@ -109,6 +108,15 @@ class Review(core.abstract_models.CommentsReviewModel):
         on_delete=models.CASCADE,
         verbose_name='произведение'
     )
+    text = models.CharField(
+        max_length=200
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='автор'
+    )
     score = models.IntegerField(
         'оценка',
         validators=(
@@ -133,6 +141,8 @@ class Review(core.abstract_models.CommentsReviewModel):
             )]
         ordering = ('pub_date',)
 
+    def str(self):
+        return self.text
 
 class Comment(core.abstract_models.CommentsReviewModel):
     review = models.ForeignKey(
@@ -145,3 +155,6 @@ class Comment(core.abstract_models.CommentsReviewModel):
         default_related_name = 'comments'
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+
+    def str(self):
+        return self.text
