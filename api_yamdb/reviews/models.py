@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from core.models import CatogoryGenreModel
 from reviews.constants import (
     ADMIN, LEN_FIELD, MAX_LEN_LEAD, MODERATOR, USER, USER_ROLES
 )
@@ -61,16 +60,19 @@ class User(AbstractUser):
         return self.username
 
 
-class Genre(CatogoryGenreModel):
+import core.abstract_models
 
-    class Meta(CatogoryGenreModel.Meta):
+
+class Genre(core.abstract_models.CatogoryGenreModel):
+
+    class Meta(core.abstract_models.CatogoryGenreModel.Meta):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
 
-class Category(CatogoryGenreModel):
+class Category(core.abstract_models.CatogoryGenreModel):
 
-    class Meta(CatogoryGenreModel.Meta):
+    class Meta(core.abstract_models.CatogoryGenreModel.Meta):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
@@ -101,21 +103,11 @@ class Title(models.Model):
         return self.name[:MAX_LEN_LEAD]
 
 
-class Review(models.Model):
+class Review(core.abstract_models.CommentsReviewModel):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='reviews',
         verbose_name='произведение'
-    )
-    text = models.CharField(
-        max_length=LEN_FIELD['MAX_LEN_TEXT_REW_COM']
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='reviews',
-        verbose_name='автор'
     )
     score = models.IntegerField(
         'оценка',
@@ -123,15 +115,15 @@ class Review(models.Model):
             MinValueValidator(LEN_FIELD['MIN_VALUE_VALID']),
             MaxValueValidator(LEN_FIELD['MAX_VALUE_VALID'])
         ),
-        error_messages={'validators': 'Оценка от 1 до 10!'}
-    )
-    pub_date = models.DateTimeField(
-        'дата публикации',
-        auto_now_add=True,
-        db_index=True
+        error_messages={
+            'validators':
+            f'Оценка от {LEN_FIELD["MIN_VALUE_VALID"]} '
+            f'до {LEN_FIELD["MAX_VALUE_VALID"]}!'
+        }
     )
 
     class Meta:
+        default_related_name = 'reviews'
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         constraints = [
@@ -141,36 +133,15 @@ class Review(models.Model):
             )]
         ordering = ('pub_date',)
 
-    def str(self):
-        return self.text[:MAX_LEN_LEAD]
 
-
-class Comment(models.Model):
+class Comment(core.abstract_models.CommentsReviewModel):
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
-        related_name='comments',
         verbose_name='отзыв'
     )
-    text = models.CharField(
-        'текст комментария',
-        max_length=LEN_FIELD['MAX_LEN_TEXT_REW_COM']
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='comments',
-        verbose_name='автор'
-    )
-    pub_date = models.DateTimeField(
-        'дата публикации',
-        auto_now_add=True,
-        db_index=True
-    )
 
-    class Meta:
+    class Meta(core.abstract_models.CommentsReviewModel.Meta):
+        default_related_name = 'comments'
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-
-    def str(self):
-        return self.text[:MAX_LEN_LEAD]

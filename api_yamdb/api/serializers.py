@@ -56,25 +56,17 @@ class SignUpSerializer(serializers.Serializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    review = serializers.SlugRelatedField(
-        slug_field='text',
-        read_only=True
-    )
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True
     )
 
     class Meta:
-        fields = ('id', 'review', 'text', 'author', 'pub_date')
+        exclude = ('review',)
         model = Comment
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    title = serializers.SlugRelatedField(
-        slug_field='name',
-        read_only=True
-    )
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True
@@ -86,7 +78,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'title', 'author', 'score', 'pub_date')
+        exclude = ('title',)
 
     def validate(self, data):
         request = self.context['request']
