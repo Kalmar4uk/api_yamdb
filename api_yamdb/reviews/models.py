@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from core.models import CatogoryGenreModel
 from reviews.constants import (
     ADMIN, LEN_FIELD, MAX_LEN_LEAD, MODERATOR, USER, USER_ROLES
 )
@@ -57,21 +58,17 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-# Импортом сразу перед его использование удалось решить
-# проблему с циклическим импортом.
-import core.abstract_models
 
+class Genre(CatogoryGenreModel):
 
-class Genre(core.abstract_models.CatogoryGenreModel):
-
-    class Meta(core.abstract_models.CatogoryGenreModel.Meta):
+    class Meta(CatogoryGenreModel.Meta):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
 
-class Category(core.abstract_models.CatogoryGenreModel):
+class Category(CatogoryGenreModel):
 
-    class Meta(core.abstract_models.CatogoryGenreModel.Meta):
+    class Meta(CatogoryGenreModel.Meta):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
@@ -102,7 +99,30 @@ class Title(models.Model):
         return self.name[:MAX_LEN_LEAD]
 
 
-class Review(core.abstract_models.CommentsReviewModel):
+class CommentsReviewModel(models.Model):
+    text = models.CharField(
+        max_length=LEN_FIELD['MAX_LEN_TEXT_REW_COM']
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='автор'
+    )
+    pub_date = models.DateTimeField(
+        'дата публикации',
+        auto_now_add=True,
+        db_index=True
+    )
+
+    class Meta:
+        abstract = True
+        ordering = ('text',)
+
+    def __str__(self):
+        return self.text[:MAX_LEN_LEAD]
+
+
+class Review(CommentsReviewModel):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -133,14 +153,14 @@ class Review(core.abstract_models.CommentsReviewModel):
         ordering = ('pub_date',)
 
 
-class Comment(core.abstract_models.CommentsReviewModel):
+class Comment(CommentsReviewModel):
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
         verbose_name='отзыв'
     )
 
-    class Meta(core.abstract_models.CommentsReviewModel.Meta):
+    class Meta(CommentsReviewModel.Meta):
         default_related_name = 'comments'
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
