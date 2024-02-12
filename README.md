@@ -78,26 +78,114 @@ python manage.py runserver
 
 **Полный список эндпоинтов проекта можно посмотреть на странице `127.0.0.1:8000/redoc`**
 
-*Получить список всех произведений:*
+1. *Получить список всех произведений:*
 ```
 127.0.0.1:8000/api/v1/titles/
 ```
-*Получить список всех категорий:*
+    * *Пример ответа:*
+    ```
+    {
+        "count": 0,
+        "next": "string",
+        "previous": "string",
+        "results": [
+            {
+                "id": 0,
+                "name": "string",
+                "year": 0,
+                "rating": 0,
+                "description": "string",
+                "genre": [
+                    {
+                        "name": "string",
+                        "slug": "string"
+                    }
+                ],
+                "category": {
+                    "name": "string",
+                    "slug": "string"
+                }
+            }
+        ]
+    }
+    ```
+2. *Получить список всех категорий:*
 ```
 127.0.0.1:8000/api/v1/categories/
 ```
-*Получить список всех жанров:*
+    * *Пример ответа:*
+    ```
+    {
+        "count": 0,
+        "next": "string",
+        "previous": "string",
+        "results": [
+            {
+                "name": "string",
+                "slug": "string"
+            }
+        ]
+    }
+    ```
+3. *Получить список всех жанров:*
 ```
 127.0.0.1:8000/api/v1/genres/
 ```
-*Получить список всех отзывов произведения:*
+    * *Пример ответа:*
+    ```
+    {
+        "count": 0,
+        "next": "string",
+        "previous": "string",
+        "results": [
+            {
+            "name": "string",
+            "slug": "string"
+            }
+        ]
+    }
+    ```
+4. *Получить список всех отзывов произведения:*
 ```
 http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/
 ```
-*Получить список всех комментариев к отзыву:*
+    * *Пример ответа:*
+    ```
+    {
+        "count": 0,
+        "next": "string",
+        "previous": "string",
+        "results": [
+            {
+                "id": 0,
+                "text": "string",
+                "author": "string",
+                "score": 1,
+                "pub_date": "2019-08-24T14:15:22Z"
+            }
+        ]
+    }
+    ```
+5. *Получить список всех комментариев к отзыву:*
 ```
 http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/
 ```
+    * Пример ответа:*
+    ```
+    {
+        "count": 0,
+        "next": "string",
+        "previous": "string",
+        "results": [
+            {
+                "id": 0,
+                "text": "string",
+                "author": "string",
+                "pub_date": "2019-08-24T14:15:22Z"
+            }
+        ]
+    }
+    ```
 
 **Работу выполнили:**
 
