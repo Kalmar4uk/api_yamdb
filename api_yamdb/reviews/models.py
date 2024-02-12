@@ -57,7 +57,8 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-
+# Импортом сразу перед его использование удалось решить
+# проблему с циклическим импортом.
 import core.abstract_models
 
 
