@@ -44,7 +44,11 @@ auth_urls = [
     path('token/', APIToken.as_view(), name='token')
 ]
 
+api_urls_v1 = [
+    path('auth/', include(auth_urls)),
+    path('', include(router_v1.urls))
+]
+
 urlpatterns = [
-    path('v1/auth/', include(auth_urls)),
-    path('v1/', include(router_v1.urls))
+    path('v1/', include(api_urls_v1))
 ]

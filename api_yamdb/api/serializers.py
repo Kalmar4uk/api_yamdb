@@ -1,12 +1,10 @@
-from datetime import datetime as dt
-
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from api import fields
-from api.constants import LEN_FIELD
+from reviews.constants import LEN_FIELD
 from reviews.models import Category, Comment, Genre, Review, Title, User
 from reviews.validators import validate_correct_username, validate_username
 
@@ -82,8 +80,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True
     )
     score = serializers.IntegerField(
-        min_value=1,
-        max_value=10
+        min_value=LEN_FIELD['MIN_VALUE_VALID'],
+        max_value=LEN_FIELD['MAX_VALUE_VALID']
     )
 
     class Meta:
@@ -122,6 +120,7 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         slug_field='slug',
         allow_empty=False,
+        allow_null=False,
         many=True
     )
     rating = serializers.IntegerField(read_only=True, default=None)
@@ -131,10 +130,3 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
-
-    def validate_year(self, value):
-        if dt.now().year < value:
-            raise serializers.ValidationError(
-                'Год произведения не может быть больше текущего.'
-            )
-        return value

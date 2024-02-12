@@ -1,4 +1,0 @@
-LEN_FIELD = {
-    'MAX_LEN_USERNAME': 150,
-    'MAX_LEN_EMAIL': 254
-}
