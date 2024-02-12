@@ -24,7 +24,6 @@ class User(AbstractUser):
         verbose_name='Почта пользователя',
         max_length=LEN_FIELD['MAX_LEN_EMAIL'],
         unique=True,
-        null=False
     )
     role = models.CharField(
         verbose_name='Пользовательская роль',
@@ -108,15 +107,6 @@ class Review(core.abstract_models.CommentsReviewModel):
         on_delete=models.CASCADE,
         verbose_name='произведение'
     )
-    text = models.CharField(
-        max_length=200
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='reviews',
-        verbose_name='автор'
-    )
     score = models.IntegerField(
         'оценка',
         validators=(
@@ -141,8 +131,6 @@ class Review(core.abstract_models.CommentsReviewModel):
             )]
         ordering = ('pub_date',)
 
-    def str(self):
-        return self.text
 
 class Comment(core.abstract_models.CommentsReviewModel):
     review = models.ForeignKey(
@@ -155,6 +143,3 @@ class Comment(core.abstract_models.CommentsReviewModel):
         default_related_name = 'comments'
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-
-    def str(self):
-        return self.text
