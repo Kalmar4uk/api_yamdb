@@ -1,5 +1,5 @@
 from django.db.models import (
-    Model, CASCADE, CharField, SlugField, ForeignKey, DateTimeField
+    CASCADE, CharField, DateTimeField, ForeignKey, Model, SlugField
 )
 
 from reviews.models import User
