@@ -38,6 +38,14 @@ class User(AbstractUser):
         blank=True
     )
 
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+        ordering = ('username',)
+
+    def __str__(self):
+        return self.username
+
     @property
     def is_admin(self):
         return (
@@ -49,14 +57,6 @@ class User(AbstractUser):
     @property
     def is_moderator(self):
         return self.role == MODERATOR
-
-    class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
-        ordering = ('username',)
-
-    def __str__(self):
-        return self.username
 
 
 class Genre(CatogoryGenreModel):
@@ -116,7 +116,7 @@ class CommentsReviewModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ('text',)
+        ordering = ('pub_date',)
 
     def __str__(self):
         return self.text[:MAX_LEN_LEAD]
@@ -141,7 +141,7 @@ class Review(CommentsReviewModel):
         }
     )
 
-    class Meta:
+    class Meta(CommentsReviewModel.Meta):
         default_related_name = 'reviews'
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
@@ -150,7 +150,6 @@ class Review(CommentsReviewModel):
                 fields=('title', 'author', ),
                 name='unique review'
             )]
-        ordering = ('pub_date',)
 
 
 class Comment(CommentsReviewModel):
