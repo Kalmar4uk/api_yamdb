@@ -82,8 +82,8 @@ python manage.py runserver
 ```
 127.0.0.1:8000/api/v1/titles/
 ```
-    * *Пример ответа:*
-    ```
+   * *Пример ответа:*
+   ```
     {
         "count": 0,
         "next": "string",
@@ -108,13 +108,13 @@ python manage.py runserver
             }
         ]
     }
-    ```
+   ```
 2. *Получить список всех категорий:*
 ```
 127.0.0.1:8000/api/v1/categories/
 ```
-    * *Пример ответа:*
-    ```
+   * *Пример ответа:*
+   ```
     {
         "count": 0,
         "next": "string",
@@ -126,13 +126,13 @@ python manage.py runserver
             }
         ]
     }
-    ```
+   ```
 3. *Получить список всех жанров:*
 ```
 127.0.0.1:8000/api/v1/genres/
 ```
-    * *Пример ответа:*
-    ```
+   * *Пример ответа:*
+   ```
     {
         "count": 0,
         "next": "string",
@@ -144,13 +144,13 @@ python manage.py runserver
             }
         ]
     }
-    ```
+   ```
 4. *Получить список всех отзывов произведения:*
 ```
 http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/
 ```
-    * *Пример ответа:*
-    ```
+   * *Пример ответа:*
+   ```
     {
         "count": 0,
         "next": "string",
@@ -165,13 +165,13 @@ http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/
             }
         ]
     }
-    ```
+   ```
 5. *Получить список всех комментариев к отзыву:*
 ```
 http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/
 ```
-    * Пример ответа:*
-    ```
+   * *Пример ответа:*
+   ```
     {
         "count": 0,
         "next": "string",
@@ -185,7 +185,7 @@ http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/
             }
         ]
     }
-    ```
+   ```
 
 **Работу выполнили:**
 
