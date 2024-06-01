@@ -29,7 +29,7 @@ cd api_yamdb
 
 *Создать и активировать виртуальное окружение*
 ```
-python source venv venv
+python -m venv venv
 ```
 ```
 source venv/Scrtipts/activate
